@@ -12,7 +12,8 @@ int A[] = { 1, 33, 56, 0, 23, 5, 34, 4, 9, 2 };
 
 int main()
 {
-	PracticeSorting::sort_Bubble(A, A+10);
+	//PracticeSorting::sort_Bubble(A, A+10);
+	ClassSorting::sort_Merge(A, A + 10, new int[10]);
 	std::cout << "Array started: " << std::endl;
 	for (int i = 0; i < 10; i++)
 	{

@@ -86,8 +86,6 @@ namespace ClassSorting
 		}
 	}
 
-
-
 	template<class TIter>
 	void sort_selection(TIter b, TIter e) // Selection sort O(n^2)
 	{
@@ -143,29 +141,34 @@ namespace ClassSorting
 	{
 		if ((e - b) > 1)
 		{
+			// [b, m)[m,e)
+			// [b, m)[m,e)
+			// [b, m)[m,e)
 			TIter m = b + (e - b) / 2;
 			sort_Merge(b, m, out);
-			sort_Merge(m, e, out + (e - b) / 2);
-			merge(b, m, m, e, out);
+			sort_Merge(m, e, out + (m - b));
+			outer_merge(b, m, m, e, out);
+			std::copy(out, out + (e - b), b);
 		}
+		assert(std::is_sorted(b, e));
 	}
 
 	template<typename TIter>
-	void merge(TIter b0, TIter e0, TIter b1, TIter e1, TIter out)
+	void outer_merge(TIter b0, TIter e0, TIter b1, TIter e1, TIter out)
 	{
 		TIter i0 = b0, i1 = b1;
 		// [b0, i0) [i0, e0)
 		// [b1, i1) [i1, e1)
 		// [..., out)[out](out, ...)
 		TIter b_out = out;
-		while (i0 < e0 and i1 < e1)
+		while (i0 < e0 && i1 < e1)
 		{
 			assert((i0 - b0) + (i1 - b1) == (out - b_out));
 			assert(std::is_sorted(b_out, out));
 			if (*i0 < *i1)
-				*out = **i0++;
+				*out = *i0++;
 			else
-				*out = **i1++;
+				*out = *i1++;
 			out++;
 			assert(std::is_sorted(b_out, out));
 			assert((i0 - b0) + (i1 - b1) == (out - b_out));
@@ -175,4 +178,28 @@ namespace ClassSorting
 		assert(std::is_sorted(b_out, out));
 		assert((e0 - b0) + (e1 - b1) == (out - b_out));
 	}
+
+	template<typename TIter>
+	void outer_Sort_Merge(TIter b, TIter e, TIter out)
+	{
+		if ((e - b) > 1)
+		{
+			// [b, m)[m,e)
+			// [b, m)[m,e)
+			// [b, m)[m,e)
+			TIter m = b + (e - b) / 2;
+			sort_Merge(b, m, out);
+			sort_Merge(m, e, out + (m - b));
+			outer_merge(b, m, m, e, out);
+			std::copy(out, out + (e - b), b);
+		}
+		assert(std::is_sorted(b, e));
+	}
 }
+
+/*
+
+1. Если ваша функция работает то можно вызывать рекурсивно
+2. Какждая функцци я должна начинаться с проверочного условия
+
+*/
