@@ -119,6 +119,41 @@ namespace PracticeSorting
 				*out = *b0;
 		}
 	}
+
+   template<typename TIter>
+   TIter partition(TIter b, TIter pivot, TIter e)
+   {
+      // [b, pivot)[pivot][pivot, e)
+      assert(b <= pivot && pivot <= e);
+
+      TIter exchange = b;
+      for (TIter pos = b; pos != e, *pos <= *pivot; ++pos)
+      {
+         assert(*pos <= *pivot);
+         exchange = pos;
+         assert(*pos <= *pivot);
+      }
+
+      if (b != e && exchange != e)
+         std::swap(*exchange, *pivot);
+
+      assert(b != e && *std::max(b, exchange) <= *exchange);
+      assert(b != e && *std::min(exchange, e) >= *exchange);
+
+      return exchange;
+   }
+
+   template<typename TIter>
+   void quick_sort(TIter b, TIter e)
+   {
+      if (e - b <= 1)
+         return;
+
+      // TIter pivot = b;
+      TIter pivot = partition(b, b + (e - b) / 2, e);
+      quick_sort(b, pivot);
+      quick_sort(pivot + 1, e);
+   }
 }
 
 #endif // !SORTING_MY_SELF

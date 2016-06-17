@@ -147,14 +147,14 @@ namespace ClassSorting
 			TIter m = b + (e - b) / 2;
 			sort_Merge(b, m, out);           // O(N/2^(k-m))
 			sort_Merge(m, e, out + (m - b)); // O(N/2^(k-m))
-			outer_merge(b, m, m, e, out);    // O(N/2^m)
+			outer_Merge(b, m, m, e, out);    // O(N/2^m)
 			std::copy(out, out + (e - b), b);
 		}
 		assert(std::is_sorted(b, e));
 	}
 
 	template<typename TIter>
-	void outer_Sort_Merge(TIter src_b, TIter src_e, TIter dst_b)
+	void outer_Sort_Merge(TIter src_b, TIter src_e, TIter dst_b) // outer merge sort
 	{
 		/*
 		 How to realize outer Merge
@@ -162,7 +162,7 @@ namespace ClassSorting
 	}
 
 	template<typename TIter>
-	void outer_merge(TIter b0, TIter e0, TIter b1, TIter e1, TIter out)
+	void outer_Merge(TIter b0, TIter e0, TIter b1, TIter e1, TIter out)
 	{
 		TIter i0 = b0, i1 = b1;
 		// [b0, i0) [i0, e0)
@@ -186,6 +186,50 @@ namespace ClassSorting
 		assert(std::is_sorted(b_out, out));
 		assert((e0 - b0) + (e1 - b1) == (out - b_out));
 	}
+
+   template<typename TIter>
+   void partition(TIter b, TIter pivot, TIter e)
+   {
+      assert(b <= pivot && pivot <= e);
+      assert(b != e);
+
+      // [b, pivot)[pivot][pivot, e)
+      // [<x)[x][x<=)
+      auto x = *pivot;
+      while ()
+      {
+         // [partitioned) [unpartitioned)
+         // [b, p)[p, bu) [bu, e)
+
+         // [b, p)[p][p+1, bu) [bu] [bu+1, e)
+         if (*bu >= *m)
+         {
+            // [b, p)[p, bu) [bu+1, e)
+            bu++;
+         }
+         else
+         {
+            // [b, p)[p][p+1, bu) [bu] [bu+1, e)
+
+         }
+      }
+
+      assert(b != pivot && *max(b, pivot) < *pivot);
+      assert(*min(pivot, e) >= *pivot);
+   }
+
+   template<typename TIter>
+   void quick_sort(TIter b, TIter e)
+   {
+      if (e - b <= 1)
+         return;
+
+      // TIter pivot = b;
+      TIter pivot = partition(b, b + (e - b) / 2, e);
+      // [b, p)[p][p+1, e)
+      quick_sort(b, pivot);
+      quick_sort(pivot+1, e);
+   }
 }
 
 /*
