@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <algorithm>
+#include <vector>
 
 namespace ClassSorting
 {
@@ -229,6 +230,84 @@ namespace ClassSorting
       // [b, p)[p][p+1, e)
       quick_sort(b, pivot);
       quick_sort(pivot+1, e);
+   }
+
+   // for low 2^8
+   template<typename I>
+   void counting_sort(std::vector<I> & v)
+   {
+      size_t counter_size = sizeof(I)*CHAR_BIT;
+      size_t counters[counter_size] = { 0 };
+
+      for (auto const &x : v)
+      {
+         ++counters[x];
+      }
+
+      size_t pos = 0;
+      for (size_t i = 0; i < counter_size; ++i)
+      {
+         for (size_t j = 0; j < counters[i]; ++j)
+         {
+            v[pos] = i;
+            pos++;
+         }
+      }
+   }
+
+   template<typename I>
+   uint8_t radix_value(I x, radix)
+   {
+      return static_cast<uint8_t>(x >> (radix*CHAR_BIT));
+   }
+
+   template<typename I>
+   std::vector<size_t> compute_frequencies(std::vector<I> & v, size_t radix)
+   {
+      size_t counter_size = sizeof(I)*CHAR_BIT;
+      std::vector<size_t> freq(counter_size, 0);
+      for (auto const &x : v)
+      {
+         auto digit = radix_value(x, value);
+         ++freq[digit];
+      }
+      return freq;
+   }
+
+   template<typename I>
+   std::vector<size_t> cumulative_sums(std::vector<I> & freq)
+   {
+      std::vector<size_t> sums(freq.size()+1);
+      std::copy(freq.begin(), freq.end(), std::back_inserter(sums))
+      for (size_t i = 1; i < sums.size(); ++i)
+      {
+         sums[i] += sums[i-1];
+      }
+      return sums;
+   }
+
+   // for big s^pow, pow is big (O(N))
+   template<typename I>
+   void radix_sort(std::vector<I> & v)
+   {
+      std::vector<I> buff(v.size());
+
+      auto radix_count = sizeof(T);
+      for (size_t radix = 0; radix < radix_count; ++radix)  // O(1)
+      {
+         auto freq = compute_frequencies(v, radix);         // O(N)
+         auto sums = cumulative_sums(freq);                 // O(1)
+
+         for (auto x : v)                                   // O(N)
+         {
+            auto digit = radix_value(x, radix);             // O(1)
+            auto index = sums[digit];                       // O(1)
+            buff[index] = x;                                // O(1)
+            ++sums[digit];                                  // O(1)
+         }
+
+         v.swap(buff);
+      }
    }
 }
 
