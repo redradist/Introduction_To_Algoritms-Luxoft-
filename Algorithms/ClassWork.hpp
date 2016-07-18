@@ -309,6 +309,53 @@ namespace ClassSorting
          v.swap(buff);
       }
    }
+
+   
+
+}
+
+namespace heap_sort {
+
+   size_t parent(size_t i)
+   {
+      return (i - 1) / 2;
+   }
+
+   size_t left(size_t i)
+   {
+      return (2 * i + 1);
+   }
+
+   size_t right(size_t i)
+   {
+      return (2 * i + 2);
+   }
+
+   template<typename I>
+   void heapify(I *arr, size_t index)
+   {
+      if (parent(index) < arr[index])
+      {
+
+      }
+
+   }
+
+   template<typename I>
+   void heap_sort(vector<T>& A)
+   {
+      build_max_heap_down(A);
+
+      // [heap)[sorted)
+      auto begin_sorted = A.size();
+      while (begin_sorted > 0)
+      {
+         begin_sorted--;
+         swap(A[begin_sorted], A[0]);
+         auto heap_size = begin_sorted;
+         heapify_down(A, 0, heap_size);
+      }
+   }
 }
 
 /*
