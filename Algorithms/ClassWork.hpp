@@ -309,53 +309,94 @@ namespace ClassSorting
          v.swap(buff);
       }
    }
-
-   
-
 }
 
-namespace heap_sort {
-
-   size_t parent(size_t i)
+namespace HeapSort {
+   template<class V>
+   V left(V i)
    {
-      return (i - 1) / 2;
+      return 2 * i + 1;
    }
 
-   size_t left(size_t i)
+   template<class V>
+   V right(V i)
    {
-      return (2 * i + 1);
+      return 2 * i + 2;
    }
 
-   size_t right(size_t i)
+   template<class V>
+   V parent(V i)
    {
-      return (2 * i + 2);
+      assert(i > 0);
+      return 2 * i + 1;
    }
-
-   template<typename I>
-   void heapify(I *arr, size_t index)
+   
+   // Insert in leasts
+   template <class T>
+   void heapify(T a[], size_t i)
    {
-      if (parent(index) < arr[index])
+      assert(is_heap(a, i));
+      if (i == 0)
+         return;
+      auto p = parent(i);
+      if (a[p] < a[i])
       {
-
+         swap(a[p], a[i]);
+         heapify(a, p);
       }
-
    }
 
-   template<typename I>
-   void heap_sort(vector<T>& A)
+   template <class T>
+   void build_max_heap(std::vector<T>& A)
+   {
+      size_t heap_size = 1;
+      while (heap_size < A.size())
+      {
+         heapify(A, heap_size);
+         heap_size++;
+      }
+   }
+
+   // Insert in head
+   template <class T>
+   void heapify_down(std::vector<T>& A, size_t i)
+   {
+      if (i >= A.size())
+         return;
+      auto max3 = compute_max_3(A, i, left(i), right(i));
+      if (i != max3)
+      {
+         swap(a[max3], a[i]);
+         heapify_down(A, max3);
+      }
+   }
+
+   template <class T>
+   void build_max_heap_down(std::vector<T>& A, size_t i)
+   {
+      auto unprocessed_size = A.size() / 2;
+      while (unprocessed_size > 0)
+      {
+         unprocessed_size--;
+         heapify_down(A, unprocessed_size);
+      }
+   }
+
+   template <class T>
+   void heap_sort(std::vector<T>& A, size_t i)
    {
       build_max_heap_down(A);
 
-      // [heap)[sorted)
       auto begin_sorted = A.size();
-      while (begin_sorted > 0)
+      while (begin_soreted > 0)
       {
          begin_sorted--;
-         swap(A[begin_sorted], A[0]);
-         auto heap_size = begin_sorted;
+         swap(A[begin_soreted], A[0]);
+         auto heap_size = gegin_sorted;
          heapify_down(A, 0, heap_size);
       }
    }
+
 }
 
 /*

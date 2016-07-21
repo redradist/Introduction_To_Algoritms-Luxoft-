@@ -2,8 +2,7 @@
   TestCase.cpp
   SortingMySelf.hpp
   SimpleSearch.cpp
-  SequentionSort.cpp
-  LinearSearch.cpp
+  TestAlgirithms.cpp
   Generating Code...
-SequentionSort.obj : error LNK2005: main already defined in LinearSearch.obj
-D:\Literature\__Luxoft\Algorithm\New folder\Sort\x64\Debug\Introduction To Algoritms.exe : fatal error LNK1169: one or more multiply defined symbols found
+  Introduction_To_Algorithms.vcxproj -> D:\Literature\__Luxoft\Algorithm\Introduction_To_Algoritms-Luxoft-\x64\Debug\Introduction To Algoritms.exe
+  Introduction_To_Algorithms.vcxproj -> D:\Literature\__Luxoft\Algorithm\Introduction_To_Algoritms-Luxoft-\x64\Debug\Introduction To Algoritms.pdb (Full PDB)
