@@ -1,6 +1,7 @@
 #pragma once
 
 #include <assert.h>
+#include <cstdlib>
 #include <algorithm>
 #include <vector>
 
@@ -370,6 +371,14 @@ namespace HeapSort {
          heapify_down(A, max3);
       }
    }
+   
+   template <class T>
+   size_t compute_max_3(std::vector<T>& A, size_t i, size_t left, size_t right)
+   {
+      /*
+       Дописать compute_max_3 (a, b, c)
+       */
+   }
 
    template <class T>
    void build_max_heap_down(std::vector<T>& A, size_t i)
@@ -388,16 +397,138 @@ namespace HeapSort {
       build_max_heap_down(A);
 
       auto begin_sorted = A.size();
-      while (begin_soreted > 0)
+      while (begin_sorted > 0)
       {
          begin_sorted--;
-         swap(A[begin_soreted], A[0]);
-         auto heap_size = gegin_sorted;
+         swap(A[begin_sorted], A[0]);
+         auto heap_size = begin_sorted;
          heapify_down(A, 0, heap_size);
       }
    }
-
 }
+
+namespace DataStruct {
+
+   template<typename T>
+   class SortedVector {
+      
+   public:
+      typedef std::vector<T>::iterator iterator;
+      typedef std::vector<T>::const_iterator const_iterator;
+      typedef T const & const_reference;
+      typedef T & reference;
+
+      SortedVector() = default;
+      SortedVector(SortedVector const &) = default;
+      SortedVector(SortedVector const &&) = default;
+      SortedVector const & operator(SortedVector const &) = default;
+      SortedVector const & operator(SortedVector const &&) = default;
+
+      template<typename TIter>
+      SortedVector(TIter first, TIter last) 
+      {
+         this->assign(first, last);
+      }
+
+      SortedVector(std::initializer_list<T> args)
+      {
+         std::vector<T> array { args };
+         std::sort(array.begin(), array.end());
+         mArray = array;
+      }
+
+      SortedVector(std::vector<T> & args)
+      {
+         std::sort(args.begin(), args.end());
+         mArray = args;
+      }
+
+      template<typename TIter>
+      void assign(TIter first, TIter last)
+      {
+         mArray.assign(first, last);
+         std::sort(mArray.begin(), mArray.end());
+         assert(valid_invarinant());
+      }
+
+      void pop_min() { mArray.pop_front(); }
+
+      void pop_max() { mArray.pop_back(); }
+
+      bool has(const_reference x) const {
+         return std::binary_search(_xbegin(), end(), x);
+      }
+
+      void swap(SortedVector & vector) { mArray.swap(vector); }
+
+      void reserve(size_t new_size) { mArray.reserve(new_size); }
+
+      void remove(size_t const index)
+      {
+         mArray.erase();
+      }
+
+      void push(const_reference x)
+      {
+         assert(valid_invarinant());
+         mArray.push_back(x);
+         iterator it = mArray.end();
+         iterator prev = it-1;
+         while (it > mArray.begin())
+         {
+            assert(std::is_sorted(mArray.begin(), prev));
+            assert(std::is_sorted(it, mArray.end());
+            if (*it < *prev)
+               std::iter_swap(it, prev);
+            else
+               break;
+            it--;
+            prev--;
+            assert(std::is_sorted(mArray.begin(), prev));
+            assert(std::is_sorted(it, mArray.end());
+         }
+         assert(valid_invarinant());
+      }
+
+      const_iterator remove(const_iterator it)
+      {
+         assert(valid_invarinant());
+         return mArray.remove(it);
+      }
+
+      const_iterator remove(const_reference it)
+      {
+         assert(valid_invarinant());
+         const_iterator it = this->lower_bound();
+         it = mArray.remove(it);
+         assert(valid_invarinant());
+         return it;
+      }
+
+      bool valid_invarinant() const { return std::is_sorted(mArray); }
+
+   public:
+      
+      const_reference peek_max() const { return mArray.front() }
+      const_reference peek_min() const { return mArray.back() }
+      const_reference peek_median() const { return *median(); }
+
+      const_iterator begin() { return mArray.begin(); }
+      const_iterator end() { return mArray.end(); }
+      const_iterator median() { return begin() + (end() - begin())/2; }
+      const_iterator lower_bound(const_reference value) const { return std::lower_bound(begin(), end(), value); }
+      const_iterator upper_bound(const_reference value) const { return std::upper_bound(begin(), end(), value); }
+
+      bool empty() const { return mArray.empty(); }
+      size_t size() const { return mArray.size(); }
+      size_t capacity() const { return mArray.capacity(); }
+
+   private:
+      std::vector<T>    mArray;
+   }
+      
+}
+
 
 /*
  1. Если ваша функция работает то можно вызывать рекурсивно
