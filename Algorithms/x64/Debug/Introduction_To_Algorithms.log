@@ -3,5 +3,5 @@
   SortingMySelf.hpp
   SimpleSearch.cpp
   TestAlgirithms.cpp
-d:\introduction_to_algoritms-luxoft-\algorithms\classwork.hpp(486): fatal error C1057: непредвиденный конец файла в раскрытии макроса
+d:\introduction_to_algoritms-luxoft-\algorithms\classwork.hpp(480): fatal error C1057: непредвиденный конец файла в раскрытии макроса
   Создание кода...

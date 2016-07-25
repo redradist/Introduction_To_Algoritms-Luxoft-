@@ -529,6 +529,168 @@ namespace DataStruct {
       
 }
 
+namespace BiList {
+   template<T> struct Node {
+      Node(const T& data_,
+         Node<T>* prev_ = 0,
+         Node<T>* next_ = 0)
+         : data(data_)
+         , prev(prev_)
+         , next(next_)
+      {
+
+      }
+
+      T data;
+      Node<T>* prev;
+      Node<T>* next;
+   }
+
+   template<class T>
+   void insert_after(Node<T>* node, const T& data) {
+      assert(node != nullptr);
+      auto new_mode = new Node<T>(data, node, node->next);
+      if (node->next)
+      {
+         node->next->prev = new_mode;
+      }
+      node->next = new_mode;
+      assert(node->next == new_mode);
+      assert(node == new_mode->prev);
+   }
+
+   template<class T>
+   void insert_before(Node<T>* node, const T& data) {
+      assert(node != nullptr);
+      auto new_mode = new Node<T>(data, node->prev, node);
+      if (node->prev)
+      {
+         node->prev->next = new_mode;
+      }
+      node->prev = new_mode;
+      assert(node->prev == new_mode);
+      assert(node == new_mode->next);
+   }
+}
+
+namespace ListOnAlgorithm {
+
+   template<class T>
+   class List {
+   public:
+      typedef size_t size_type;
+      typedef T value_type;
+      typedef T& reference;
+      typedef const T& const_reference;
+      typedef BiList::iterator const iterator;
+
+   public:
+      List()
+      : m_head()
+      , m_tail(nullptr)
+      , m_size(nullptr)
+      { }
+
+      List(const List& rhs) { /*  */ }
+      
+      const List<T>& operator=(const List& rhs) {
+         if (this != &rhs)
+            this->swap(List<T>(rhs));
+         return *this;
+      }
+
+      void swap(List<T>& rhs) {
+         swap(this->m_head, rhs.m_head);
+         swap(this->m_tail, rhs.m_tail);
+         swap(this->m_size, rhs.m_size);
+      }
+
+      ~List() {  }
+
+   public:
+
+      // before c++11 standard size casts O(N) in c++11 O(1)
+      size_type size() const { return m_size; }
+      bool empty() const { return size() == 0; }
+
+   public: // iterators
+
+      itertator begin() { return iterator(m_head); }
+      itertator end()   { return ++iterator(m_tail); }
+
+      void push_front(const_reference data) {
+         assert(validate_invariant());
+         
+         if (!empty())
+         {
+            BiList::insert_before(m_head, data);
+            m_head = m_head.prev;
+            m_size++;
+         }
+         else
+         {
+            m_head = m_tail = new Node<value_type>(data);
+            m_size = 1;
+         }
+
+         assert(validate_invariant());
+      }
+
+      void push_back(const_reference data) {
+         assert(validate_invariant());
+
+         if (!empty())
+         {
+            BiList::insert_after(m_tail, data);
+            m_tail = m_tail.next;
+            m_size++;
+         }
+         else
+         {
+            m_head = m_tail = new Node<value_type>(data);
+            m_size = 1;
+         }
+
+         assert(validate_invariant());
+      }
+
+   private:
+
+      bool validate_head() xonst
+      {
+         return m_head == nullptr || m_head->next == nullptr;
+      }
+
+      bool validate_tail() xonst
+      {
+         return m_tail == nullptr || m_tail->next == nullptr;
+      }
+
+      size_type compute_size() const
+      {
+         auto node = m_head;
+         size_t result = 0;
+         while (node)
+         {
+            node = node->next;
+            result++;
+         }
+         return result;
+      }
+
+      bool validate_invariant() xonst
+      {
+         return 
+            m_head->prev = nullptr &&
+            m_tail->next == nullptr &&
+            compute_size(m_head) == m_size;
+      }
+
+      BiList::Node<T>   *m_head;
+      BiList::Node<T>   *m_tail;
+      size_type         m_size;
+   };
+}
 
 /*
  1. Если ваша функция работает то можно вызывать рекурсивно
