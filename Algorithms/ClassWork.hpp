@@ -531,17 +531,36 @@ namespace DataStruct {
 
 namespace BiList {
    template<T> struct Node {
-      Node(const T& data_,
-         Node<T>* prev_ = 0,
-         Node<T>* next_ = 0)
-         : data(data_)
-         , prev(prev_)
-         , next(next_)
-      {
+      Node<T>* prev;
+      Node<T>* next;
+   }
 
-      }
+   template<T> struct RealNode : public Node<T> 
+      RealNode(const T& data_,
+               Node<T>* prev_ = nullptr,
+               Node<T>* next_ = nullptr)
+      : data(data_)
+      , prev(prev_)
+      , next(next_)
+      { }
 
-      T data;
+      T &data;
+      Node<T>* prev;
+      Node<T>* next;
+   }
+
+   template<T> struct DummyNode : public Node<T> {
+      DummyNode()
+      , prev(this)
+      , next(this)
+      { }
+
+      DummyNode(Node<T>* prev_,
+               Node<T>* next_)
+      , prev(prev_)
+      , next(next_)
+      { }
+      
       Node<T>* prev;
       Node<T>* next;
    }
@@ -549,27 +568,38 @@ namespace BiList {
    template<class T>
    void insert_after(Node<T>* node, const T& data) {
       assert(node != nullptr);
-      auto new_mode = new Node<T>(data, node, node->next);
-      if (node->next)
-      {
-         node->next->prev = new_mode;
-      }
-      node->next = new_mode;
+
+      _what->prev = _where->prev;
+      _what->next = _where;
+
+      _where->prev->next = _what;
+      _where->prev = _what;
+
       assert(node->next == new_mode);
       assert(node == new_mode->prev);
    }
 
    template<class T>
-   void insert_before(Node<T>* node, const T& data) {
-      assert(node != nullptr);
-      auto new_mode = new Node<T>(data, node->prev, node);
-      if (node->prev)
-      {
-         node->prev->next = new_mode;
-      }
-      node->prev = new_mode;
-      assert(node->prev == new_mode);
-      assert(node == new_mode->next);
+   void insert_before(Node<T>* _where, Node<T>* _what) {
+      assert(_where != nullptr);
+      assert(_where->next != nullptr);
+      assert(_what != nullptr);
+
+      _what->prev = _where;
+      _what->next = _where->next;
+
+      _where->next->prev = _what;
+      _where->next = _what;
+      assert(_where != nullptr);
+      assert(_what != nullptr);
+   }
+
+   template<class T>
+   Node<T>* cut_out(Node<T>* what) {
+      assert(what != nullptr);
+
+      what->prev->next = what->next;
+      what->next->prev = what->prev;
    }
 }
 
@@ -586,10 +616,12 @@ namespace ListOnAlgorithm {
 
    public:
       List()
-      : m_head()
-      , m_tail(nullptr)
-      , m_size(nullptr)
-      { }
+      : m_pivot()
+      , m_size(0)
+      { 
+         m_head = m_tail = new Node<value_type>(data);
+         m_size = 1;
+      }
 
       List(const List& rhs) { /*  */ }
       
@@ -615,23 +647,15 @@ namespace ListOnAlgorithm {
 
    public: // iterators
 
-      itertator begin() { return iterator(m_head); }
-      itertator end()   { return ++iterator(m_tail); }
+      iterator begin() { return iterator(m_head); }
+      iterator end()   { return ++iterator(m_tail); }
 
       void push_front(const_reference data) {
          assert(validate_invariant());
          
-         if (!empty())
-         {
-            BiList::insert_before(m_head, data);
-            m_head = m_head.prev;
-            m_size++;
-         }
-         else
-         {
-            m_head = m_tail = new Node<value_type>(data);
-            m_size = 1;
-         }
+         auto node = new RealNode<T>(data);
+         insert_after(&m_pivot, node);
+         m_size++;
 
          assert(validate_invariant());
       }
@@ -639,32 +663,41 @@ namespace ListOnAlgorithm {
       void push_back(const_reference data) {
          assert(validate_invariant());
 
-         if (!empty())
-         {
-            BiList::insert_after(m_tail, data);
-            m_tail = m_tail.next;
-            m_size++;
-         }
-         else
-         {
-            m_head = m_tail = new Node<value_type>(data);
-            m_size = 1;
-         }
+         auto node = new RealNode<T>(data);
+         insert_before(&m_pivot, node);
+         m_size++;
 
          assert(validate_invariant());
       }
 
+      iterator insert(iterator it, const_reference data)
+      {
+         auto node = new RealNode<T>(data);
+         insert_before(it.m_node, mode);
+         m_size++;
+
+         assert(validate_invariant());
+         return iterator(node);
+      }
+
+      iterator erase(iterator it)
+      {
+         assert(it != end());
+
+         auto node = it.m_node;
+         auto node = BiList::cut_out(node);
+         delete static_cast<RealNode<T>*>(node);
+         m_size--;
+
+         assert(validate_invariant());
+         return iterator(node);
+      }
+
    private:
 
-      bool validate_head() xonst
-      {
-         return m_head == nullptr || m_head->next == nullptr;
-      }
+      bool validate_head() const { return m_head == nullptr || m_head->next == nullptr; }
 
-      bool validate_tail() xonst
-      {
-         return m_tail == nullptr || m_tail->next == nullptr;
-      }
+      bool validate_tail() const { return m_tail == nullptr || m_tail->next == nullptr; }
 
       size_type compute_size() const
       {
@@ -678,7 +711,7 @@ namespace ListOnAlgorithm {
          return result;
       }
 
-      bool validate_invariant() xonst
+      bool validate_invariant() const
       {
          return 
             m_head->prev = nullptr &&
@@ -686,9 +719,9 @@ namespace ListOnAlgorithm {
             compute_size(m_head) == m_size;
       }
 
-      BiList::Node<T>   *m_head;
-      BiList::Node<T>   *m_tail;
-      size_type         m_size;
+      BiList::DummyNode<T>    m_pivot;
+      BiList::Node<T>         m_tail;
+      size_type               m_size;
    };
 }
 
