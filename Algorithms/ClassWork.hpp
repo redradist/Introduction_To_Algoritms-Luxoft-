@@ -601,6 +601,75 @@ namespace BiList {
       what->prev->next = what->next;
       what->next->prev = what->prev;
    }
+
+   template<typename T> 
+   struct iterator 
+   {
+      typedef size_t size_type;
+      typedef T value_type;
+      typedef T* pointer;
+      typedef std::difference_type difference_type;
+
+      iterator(const iterator& rhs) = default;
+      iterator(const iterator&& rhs) = default;
+      const iterator<T>& operator=(const iterator& rhs) = default;
+      const iterator<T>&& operator=(const iterator&& rhs) = default;
+
+   public:
+
+      pointer operator->() 
+      {
+         assert(validate_invariant());
+         return &(this->operator*());
+      }
+
+      reference operator*()
+      {
+         assert(validate_invariant());
+         return static_cast<RealNode<T>*>(m_node)->data;
+      }
+
+      bool operator==(const iterator<T>& rhs) const
+      {
+         return m_node == rhs.m_node;
+      }
+
+      bool operator!=(const iterator<T>& rhs) const
+      {
+         return !(*this == rhs);
+      }
+
+      iterator& operator++() {
+         return m_node = m_node->next;
+      }
+
+      iterator& operator++(int i) {
+         auto node = m_node;
+         m_node = m_node->next;
+         return node;
+      }
+
+      iterator& operator--() {
+         return m_node = m_node->prev;
+      }
+
+      iterator& operator--(int i) {
+         auto node = m_node;
+         m_node = m_node->prev;
+         return node;
+      }
+
+   private:
+
+      bool validate_invariant() const {
+         return dynamic_cast<RealNode<T>*>(m_node) != nullptr;
+      }
+
+      friend class List<T>;
+      iterator(Node<T>* node) : m_node(node) { }
+
+      Node<T> *m_node;
+   }
 }
 
 namespace ListOnAlgorithm {
@@ -612,18 +681,24 @@ namespace ListOnAlgorithm {
       typedef T value_type;
       typedef T& reference;
       typedef const T& const_reference;
-      typedef BiList::iterator const iterator;
+      typedef BiList::iterator<T> const_iterator;
 
    public:
       List()
       : m_pivot()
       , m_size(0)
       { 
-         m_head = m_tail = new Node<value_type>(data);
-         m_size = 1;
+         
       }
 
-      List(const List& rhs) { /*  */ }
+      List(const List& rhs)
+      : List()
+      {
+         for (const auto& x : rhs)
+         {
+            this->push_back(x);
+         }
+      }
       
       const List<T>& operator=(const List& rhs) {
          if (this != &rhs)
@@ -637,7 +712,9 @@ namespace ListOnAlgorithm {
          swap(this->m_size, rhs.m_size);
       }
 
-      ~List() {  }
+      ~List() {
+         
+      }
 
    public:
 
@@ -647,8 +724,13 @@ namespace ListOnAlgorithm {
 
    public: // iterators
 
-      iterator begin() { return iterator(m_head); }
-      iterator end()   { return ++iterator(m_tail); }
+      iterator begin() { return iterator(m_pivot->next); }
+      iterator end()   { return iterator(m_pivot); }
+
+      iterator front() { return *begin(); }
+      iterator back() { return *(--end()); }
+
+   public:
 
       void push_front(const_reference data) {
          assert(validate_invariant());
@@ -692,6 +774,13 @@ namespace ListOnAlgorithm {
          assert(validate_invariant());
          return iterator(node);
       }
+
+   public:
+
+      void reverse();
+      void sort();
+      void merge();
+      void splice();
 
    private:
 
