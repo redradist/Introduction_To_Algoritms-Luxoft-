@@ -6,11 +6,24 @@ class Tree:
 		self.left = left
 		self.right = right
 
+	def height(self):
+		pass
+
 	def __str__(self):
 		return str(self.data)
 
 	def nodes(self):
 		yield from dfs(self)
+
+	def to_graph(self):
+		G = Graph()
+		def visitor(node):
+			if node.data not in G.adjList:
+				G.add_single_vertex(node.data)
+			if node.left:
+				G.add_edges((node.data, node.left.data))
+			if node.right:
+				G.add_edges((node.data, node.right.data))
 
 def dfs(tree):
 	if tree:
@@ -72,21 +85,56 @@ def printTree2(t):
 		if t.data != None:
 			print(t.data)
 
+class Queue:
+	def __init__(self):
+		self._data = []
+
+	def push(self, x):
+		self._data.append(x)
+
+	def pop():
+		return self._data.pop(0)
+
+	def empty():
+		return len(self._data) == 0
+
+def bfs(tree, visitor):
+	queue = Queue()
+	queue.push(tree)
+	while not queue.empty():
+		node = queue.pop()
+
+		if node.left:
+			queue.push(node.left)
+		if node.right:
+			queue.push(node.right)
+		visitor(node)
+
 def co_numbers(max, pred):
 	for i in range(max):
 		if pred(i):
 			yield i
 
+def natural_numbers():
+	i = 1
+	while True:
+		yield i
+		i += 1
+
 def main():
 
 	def divided_by_3():
 		for i in co_numbers(10, lambda x: x%3==0):
-			print(i)
+			yield i
 
 	for i in divided_by_3():
 		print(i)
+	kj = divided_by_3()
+	print(dir(divided_by_3()))
+	print(kj.__next__())
+	print(kj.__next__())
+	print(kj.__next__())
 	return
-
 	t = Tree(1, 
 			Tree(2, 
 				Tree(4), 
@@ -100,7 +148,6 @@ def main():
 	#printTree0(t)
 	#printTree1(t)
 	#printTree2(t)
-	#print(t)
 	traverse_pre_order(t, print)
 	traverse_in_order(t, print)
 	traverse_post_order(t, print)
@@ -108,5 +155,9 @@ def main():
 	for node in t.nodes() :
 		print(node)
 
+
 if __name__ == '__main__':
 	main()
+
+
+# Calculate height of Tree
