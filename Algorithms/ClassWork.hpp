@@ -814,7 +814,23 @@ namespace ListOnAlgorithm {
    };
 }
 
+namespace Trees {
+   class Tree {
+   public:
+      Tree()
+      {
+
+      }
+
+   private:
+      T data;
+      Tree *left;
+      Tree *right;
+   }
+}
+
 /*
  1. Если ваша функция работает то можно вызывать рекурсивно
  2. Какждая функцци я должна начинаться с проверочного условия
+ 3. forward_list рассмотреть самостоятельно
  */
