@@ -1,4 +1,4 @@
-
+from tree_lib import *
 
 class Tree:
 	def __init__(self, data, left=None, right=None):
@@ -7,13 +7,25 @@ class Tree:
 		self.right = right
 
 	def height(self):
-		pass
+		size = 1
+		hl = 0; hr = 0
+		if self.left != None:
+			hl = self.left.height()
+		if self.right != None:
+			hr = self.right.height()
+		if hl > hr:
+			size += hl
+		elif hl < hr:
+			size += hr
+		else:
+			size += hl
+		return size
 
 	def __str__(self):
 		return str(self.data)
 
 	def nodes(self):
-		yield from dfs(self)
+		yield from dfs_pre_order(self)
 
 	def to_graph(self):
 		G = Graph()
@@ -24,12 +36,6 @@ class Tree:
 				G.add_edges((node.data, node.left.data))
 			if node.right:
 				G.add_edges((node.data, node.right.data))
-
-def dfs(tree):
-	if tree:
-		yield tree
-		yield from traverse_pre_order(tree.left, visitor)
-		yield from traverse_pre_order(tree.right, visitor)
 
 def foo():
 	db = { k : v for k, v in db.items() }
@@ -45,24 +51,6 @@ def strTree(t):
 		return result
 	else:
 		return "None"
-
-def traverse_pre_order(tree, visitor):
-	if tree:
-		visitor(tree)
-		traverse_pre_order(tree.left, visitor)
-		traverse_pre_order(tree.right, visitor)
-
-def traverse_in_order(tree, visitor):
-	if tree:
-		traverse_pre_order(tree.left, visitor)
-		visitor(tree)
-		traverse_pre_order(tree.right, visitor)
-
-def traverse_post_order(tree, visitor):
-	if tree:
-		traverse_pre_order(tree.left, visitor)
-		traverse_pre_order(tree.right, visitor)
-		visitor(tree)
 
 def printTree0(t):
 	if t != None:
@@ -123,18 +111,17 @@ def natural_numbers():
 
 def main():
 
-	def divided_by_3():
+	def co_divided_by_3():
 		for i in co_numbers(10, lambda x: x%3==0):
 			yield i
 
-	for i in divided_by_3():
+	for i in co_divided_by_3():
 		print(i)
-	kj = divided_by_3()
-	print(dir(divided_by_3()))
+	kj = co_divided_by_3()
+	print(dir(co_divided_by_3()))
 	print(kj.__next__())
 	print(kj.__next__())
 	print(kj.__next__())
-	return
 	t = Tree(1, 
 			Tree(2, 
 				Tree(4), 
@@ -145,9 +132,11 @@ def main():
 				Tree(7,
 					Tree(9,
 						Tree(10)))))
+	print("Height of tree is "+str(t.height()))
 	#printTree0(t)
 	#printTree1(t)
 	#printTree2(t)
+	dfs_pre_order(t)
 	traverse_pre_order(t, print)
 	traverse_in_order(t, print)
 	traverse_post_order(t, print)
@@ -160,4 +149,4 @@ if __name__ == '__main__':
 	main()
 
 
-# Calculate height of Tree
+# Calculate height of Tree2.7 will have an extended period of maintenance
