@@ -21,6 +21,12 @@ class Tree:
 			size += hl
 		return size
 
+	def is_balanced():
+		"""
+		Check if Tree is balanced
+		"""
+		pass
+
 	def __str__(self):
 		return str(self.data)
 
@@ -36,6 +42,14 @@ class Tree:
 				G.add_edges((node.data, node.left.data))
 			if node.right:
 				G.add_edges((node.data, node.right.data))
+
+		traverse_pre_order(self, visitor)
+		return G
+
+def height(tree):
+	if not tree:
+		return 0
+	return 1 + max(height(tree.left), height(tree.right))
 
 def foo():
 	db = { k : v for k, v in db.items() }
@@ -150,3 +164,4 @@ if __name__ == '__main__':
 
 
 # Calculate height of Tree2.7 will have an extended period of maintenance
+# Write function isBalanced(Tree)
