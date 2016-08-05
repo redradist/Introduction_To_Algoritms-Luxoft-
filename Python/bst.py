@@ -1,3 +1,7 @@
+import networkx as nx
+import math
+from random import shuffle
+import matplotlib.pyplot as plt
 import tree_lib
 
 class Tree:
@@ -43,17 +47,37 @@ class Tree:
 		yield from dfs_pre_order(self)
 
 	def to_graph(self):
-		G = Graph()
-		def visitor(node):
-			if node.data not in G.adjList:
-				G.add_single_vertex(node.data)
+		g = nx.Graph()
+		for node in dfs_nodes(self):
 			if node.left:
-				G.add_edges((node.data, node.left.data))
+				g.add_edge(node.data, node.left.data)
 			if node.right:
-				G.add_edges((node.data, node.right.data))
+				g.add_edge(node.data, node.right.data)
 
-		traverse_pre_order(self, visitor)
-		return G
+		return g
+
+	def get_positions(node, positions, x, y):
+		if node:
+			node_size = 0.5
+
+			my_x = (x[1] + x[0]) / 2
+			my_y = y[0] + (node_size / 2)
+
+			positions[node.data] = (my_x, -my_y)
+			Tree.get_positions(node.left, positions, (x[0], my_x), (my_y, y[1]))
+			Tree.get_positions(node.right, positions, (my_x, x[1]), (my_y, y[1]))
+
+	def draw(self):
+		positions = {}
+		Tree.get_positions(self, positions, x=(0, 10), y=(0, 10))
+
+		print(positions)
+
+		g = self.to_graph()
+
+		plt.axis('on')
+		nx.draw_networkx(g, positions, node_size=1500, font_size=24, node_color='g')
+		plt.show()
 
 def is_bst(tree):
 	if not tree:
@@ -108,42 +132,39 @@ def iterator(bst):
 		yield it
 		it = next_node(it)
 
-def lower_bound_1(bst, x):
-	assert is_bst(bst)
-	if bst:
-		if bst.data < x:
-			return lower_bound(bst.right, x)
-		if x < bst.data:
-			result = lower_bound(bst.left, x)
-			if result:
-				return result
-		return bst
-	else:
-		return None
-
-
-def lower_bound_2(bst, x):
+def lower_bound(bst, x):
 	#assert is_bst(bst)
-	if not bst:
-		return bst
-	
-	if x < bst.data:
-		result = lower_bound_2(bst.left, x)
-	else:
-		result = lower_bound_2(bst.right, x)
 
-	if not result:
-		return bst
-	return result
+	if bst:
+		if x < bst.data:
+			res = lower_bound(bst.left, x)
+			if res:
+				bst = res
+		elif bst.data < x:
+			return lower_bound(bst.data, x)
+	return bst
 
-def lower_bound_3(bst, x):
-	assert is_bst(bst) and bst is not None
-
-	
 
 def insert(tree, x):
-	place = lower_bound(tree, x)
+	#assert is_bst(tree)
 
+	if not tree:
+		return Tree(x)
+
+	if x < tree.data:
+		if tree.left:
+			return insert(tree.left, x)
+		else:
+			tree.left = Tree(x)
+			return tree.left
+	elif tree.data < x:
+		if tree.right:
+			return insert(tree.right, x)
+		else:
+			tree.right = Tree(x)
+			return tree.right
+
+	return tree
 
 def dfs_nodes(tree):
 	if tree:
@@ -151,6 +172,8 @@ def dfs_nodes(tree):
 		yield tree
 		yield from dfs_nodes(tree.right)
 
+def remove(tree, x):
+	place = find(tree, x)
 
 def create_tree_1():
 	return Tree(10, 
@@ -193,8 +216,13 @@ def create_tree_2():
 def main():
 	t = create_tree_1()
 
-	print(lower_bound_2(t, 10))
-	print(", ".join(map(str, dfs_nodes(t))))
+	print(lower_bound(t, 10))
+
+	for i in range(25):
+		print("Insert "+str(i))
+		insert(t, i)
+		print(", ".join(map(str, dfs_nodes(t))))
+	t.draw()
 
 if __name__ == '__main__':
 	main()
