@@ -174,6 +174,17 @@ def dfs_nodes(tree):
 
 def remove(tree, x):
 	place = find(tree, x)
+	rotate_left(rotate_left(place)()
+	place = find(tree, x)
+
+def rotate_left(node):
+	if node and node.right:
+		new_root = node.right
+		node_left = node.right.left
+		node.right = node_left
+		new_root.left = node
+		return node
+
 
 def create_tree_1():
 	return Tree(10, 
