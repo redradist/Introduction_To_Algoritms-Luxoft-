@@ -14,6 +14,10 @@ int A[] = { 1, 33, 56, 0, 23, 5, 34, 4, 9, 2 };
 
 int main()
 {
+   hash_map<char, string> M;
+
+
+
    TestCase::checkSearchAlt(binary_search_);
 	//PracticeSorting::sort_Bubble(A, A+10);
 	//ClassSorting::sort_Merge(A, A + 10, new int[10]);

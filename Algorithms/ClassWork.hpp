@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <algorithm>
 #include <vector>
+#include <deque>
 
 namespace ClassSorting
 {
@@ -826,6 +827,158 @@ namespace Trees {
       T data;
       Tree *left;
       Tree *right;
+   }
+}
+
+namespace HashData {
+
+   template<typename TKey, typename TValue, typename THasher=std::hash<TKey>>
+   class hash_map
+   {
+   public:
+      typedef TKey key_type;
+      typedef std::pair<key_type, TValue> value_type;
+      typedef std::deque<TValue> bucket_type;
+      typedef bucket_type::size_type size_type;
+      typedef bucket_type::value_type value_type;
+      typedef bucket_type::reference reference;
+      typedef bucket_type::const_reference const_reference;
+      
+      typedef THasher hasher_type;
+
+      typedef std::vector<bucket_type> storage_type;
+
+      typedef hash_map<TKey, TValue, THasher> self_type;
+
+      class iterator
+      {
+      public:
+         typedef stoage_type::iterator storage_iterator;
+
+         iterator(const storage_iterator& b, const storage_iterator& e)
+         : m_bucket(b)
+         , m_bucket_end(e)
+         {
+            if (b != e)
+            {
+               m_pos = b->begin();
+            }
+            fix_pos();
+         }
+
+         bool oparator ==(const iterator& rhs) const
+         {
+            if (m_bucket != rhs.m_bucket)
+            {
+               return false;
+            }
+
+            if (m_bucket != m_bucket_end)
+            {
+               return true;
+            }
+            return m_pos == rhs.m_pos;
+         }
+
+         iterator operator++()
+         {
+            ++m_pos;
+            fix_pos();
+            return *this;
+         }
+
+         void fix_pos()
+         {
+            if (m_pos == m_bucket.end())
+            {
+               m_bucket = find_if(m_bucket, m_bucket_end,
+                  [](const bucket7 bucket) { return !bucket.empty(); }
+               );
+               m_pos = m_bucket.begin();
+            }
+         }
+
+         storage_iterator     m_bucket;
+         bucket_iterator      m_pos;
+      }
+
+   public:
+      hash_map(
+         size_type bucket_count = 64,
+         hasher_type hasher = hasher_type())
+         : m_buckets(bucket_count, bucket_type())
+         , m_hasher(hasher_type)
+
+      ~hash_map() = default;
+
+      hash_map(const self_type&) = default;
+      hash_map(self_type&&) = default;
+
+      hash_map<T, THasher>& operator=(const self_type&) = default;
+      hash_map<T, THasher>&& operator=(self_type&&) = default;
+
+   public:
+
+      TValue& operator[](const key_type& key) const
+      {
+         /// 
+      }
+
+      sie_type hash(const key_type& key) const
+      {
+         return m_hasher(key) % m_bucket.size();
+      }
+
+      reference find(const value_type& x)
+      {
+         auto& bucket = find_bucket(x.first);
+         auto& elem = find_element(bucket, x.first);
+
+         auto iter =
+            iter.m_pos -= elem;
+         return iter;
+      }
+
+      reference insert(const value_type& x)
+      {
+         auto& bucket = find_bucket(x.first);
+         bucket.push_front(x);
+         return bucket.front();
+      }
+
+      void remove(const key_type& key)
+      {
+         iterator it = find(key);
+         it.m_bucket.erase(iter.m_pos)
+      }
+
+   public:
+
+      iterator begin()
+      {
+         return iterator(m_bucket.begin(), m_bucket.end());
+      }
+
+   private:
+      bucket_type& find_bucket(const key_type& key)
+      {
+         size_type bucket_number = hash(key);
+         assert(bucket_number < m_bucket.size());
+         return m_bucket[bucket_number];
+      }
+
+      bucket_type::iterator& find_element(bucket_type& bucket, const key_type& key)
+      {
+         return std:find_if(bucket.begin(), bucket.end(), 
+            [&key](const value_type& val)
+            {
+               return val.first == key;
+            }
+         );
+      }
+
+      storage_type   m_buckets;
+      hasher_type    m_hasher;
    }
 }
 
